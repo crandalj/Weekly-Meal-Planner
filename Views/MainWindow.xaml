@@ -1,0 +1,197 @@
+﻿<Window x:Class="Weekly_Meal_Planner.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Weekly_Meal_Planner"
+        mc:Ignorable="d"
+        Title="Weekly Meal Planner" Height="600" Width="800">
+    <Window.Resources>
+        <DataTemplate x:Key="DayNutritionTemplate">
+            <StackPanel Style="{StaticResource dayNutritionPanelStyle}">
+                <StackPanel Style="{StaticResource dayNutritionPanelElementStyle}">
+                    <Label Style="{StaticResource dayNutritionPanelLabelStyle}">Calories</Label>
+                    <Label Style="{StaticResource dayNutritionPanelLabelValueStyle}" Content="{Binding Path=Calorie}"></Label>
+                </StackPanel>
+                <StackPanel Style="{StaticResource dayNutritionPanelElementStyle}">
+                    <Label Style="{StaticResource dayNutritionPanelLabelStyle}">Carbs</Label>
+                    <Label Style="{StaticResource dayNutritionPanelLabelValueStyle}" Content="{Binding Carb}"></Label>
+                </StackPanel>
+                <StackPanel Style="{StaticResource dayNutritionPanelElementStyle}">
+                    <Label Style="{StaticResource dayNutritionPanelLabelStyle}">Fat</Label>
+                    <Label Style="{StaticResource dayNutritionPanelLabelValueStyle}" Content="{Binding Fat}"></Label>
+                </StackPanel>
+                <StackPanel Style="{StaticResource dayNutritionPanelElementStyle}">
+                    <Label Style="{StaticResource dayNutritionPanelLabelStyle}">Protein</Label>
+                    <Label Style="{StaticResource dayNutritionPanelLabelValueStyle}" Content="{Binding Protein}"></Label>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/img/corkboard.png" />
+        </Grid.Background>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="75"/>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="115"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <!-- Title Label -->
+        <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Background="White" Margin="10">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource weeklyTitleTextStyle}">Meals of the Week</Label>
+        </Border>
+        <!-- Buttons -->
+        <Button Grid.Column="3" Grid.Row="0" Click="NewMeal" Style="{StaticResource weekViewButtonStyle}">New Meal</Button>
+        <Button Grid.Column="4" Grid.Row="0" Click="SaveWeek_Click" Style="{StaticResource weekViewButtonStyle}">Save Week</Button>
+        <Button Grid.Column="5" Grid.Row="0" Click="LoadWeek_Click" Style="{StaticResource weekViewButtonStyle}">Load Week</Button>
+        <Button Grid.Column="6" Grid.Row="0" Click="ResetWeek_Click" Style="{StaticResource weekViewButtonStyle}">Reset Week</Button>
+        <!-- Days of the Week Labels -->
+        <Border Grid.Column="0" Grid.Row="1" Style="{StaticResource dayBorderStyle}">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource dayLabelTextStyle}">Sunday</Label>
+        </Border>
+        <Border Grid.Column="1" Grid.Row="1" Style="{StaticResource dayBorderStyle}">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource dayLabelTextStyle}">Monday</Label>
+        </Border>
+        <Border Grid.Column="2" Grid.Row="1" Style="{StaticResource dayBorderStyle}">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource dayLabelTextStyle}">Tuesday</Label>
+        </Border>
+        <Border Grid.Column="3" Grid.Row="1" Style="{StaticResource dayBorderStyle}">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource dayLabelTextStyle}">Wednesday</Label>
+        </Border>
+        <Border Grid.Column="4" Grid.Row="1" Style="{StaticResource dayBorderStyle}">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource dayLabelTextStyle}">Thursday</Label>
+        </Border>
+        <Border Grid.Column="5" Grid.Row="1" Style="{StaticResource dayBorderStyle}">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource dayLabelTextStyle}">Friday</Label>
+        </Border>
+        <Border Grid.Column="6" Grid.Row="1" Style="{StaticResource dayBorderStyle}">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource dayLabelTextStyle}">Saturday</Label>
+        </Border>
+
+        <!-- Sunday nutrition -->
+        <ContentControl Grid.Column="0" Grid.Row="2" 
+                        Content="{Binding Path=Days[0].Nutrition}" 
+                        ContentTemplate="{StaticResource DayNutritionTemplate}" 
+         />
+        <!-- Monday nutrition -->
+        <ContentControl Grid.Column="1" Grid.Row="2" 
+                        Content="{Binding Path=Days[1].Nutrition}" 
+                        ContentTemplate="{StaticResource DayNutritionTemplate}" 
+         />
+        <!-- Tuesday nutrition -->
+        <ContentControl Grid.Column="2" Grid.Row="2" 
+                        Content="{Binding Path=Days[2].Nutrition}" 
+                        ContentTemplate="{StaticResource DayNutritionTemplate}" 
+         />
+        <!-- Wednesday nutrition -->
+        <ContentControl Grid.Column="3" Grid.Row="2" 
+                        Content="{Binding Path=Days[3].Nutrition}" 
+                        ContentTemplate="{StaticResource DayNutritionTemplate}" 
+         />
+        <!-- Thursday nutrition -->
+        <ContentControl Grid.Column="4" Grid.Row="2" 
+                        Content="{Binding Path=Days[4].Nutrition}" 
+                        ContentTemplate="{StaticResource DayNutritionTemplate}" 
+         />
+        <!-- Friday nutrition -->
+        <ContentControl Grid.Column="5" Grid.Row="2" 
+                        Content="{Binding Path=Days[5].Nutrition}" 
+                        ContentTemplate="{StaticResource DayNutritionTemplate}" 
+         />
+        <!-- Saturday nutrition -->
+        <ContentControl Grid.Column="6" Grid.Row="2" 
+                        Content="{Binding Path=Days[6].Nutrition}" 
+                        ContentTemplate="{StaticResource DayNutritionTemplate}" 
+         />
+        
+        <!-- Sunday meals -->
+        <ListView Grid.Column="0" Grid.Row="3" Name="SundayMeals" ItemsSource="{Binding Days[0].Meals}" MouseDoubleClick="HandleDoubleClick">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding Type}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <!-- Monday meals -->
+        <ListView Grid.Column="1" Grid.Row="3" ItemsSource="{Binding Days[1].Meals}" MouseDoubleClick="HandleDoubleClick">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding Type}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <!-- Tuesday meals -->
+        <ListView Grid.Column="2" Grid.Row="3" ItemsSource="{Binding Days[2].Meals}" MouseDoubleClick="HandleDoubleClick">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding Type}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <!-- Wednesday meals -->
+        <ListView Grid.Column="3" Grid.Row="3" ItemsSource="{Binding Days[3].Meals}" MouseDoubleClick="HandleDoubleClick">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding Type}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <!-- Thursday meals -->
+        <ListView Grid.Column="4" Grid.Row="3" ItemsSource="{Binding Days[4].Meals}" MouseDoubleClick="HandleDoubleClick">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding Type}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <!-- Friday meals -->
+        <ListView Grid.Column="5" Grid.Row="3" ItemsSource="{Binding Days[5].Meals}" MouseDoubleClick="HandleDoubleClick">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding Type}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <!-- Saturday meals -->
+        <ListView Grid.Column="6" Grid.Row="3" ItemsSource="{Binding Days[6].Meals}" MouseDoubleClick="HandleDoubleClick">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding Type}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Window>
