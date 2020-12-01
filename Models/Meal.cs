@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Weekly_Meal_Planner
 {
-    [Serializable]
     public class Meal
     {   
         public Nutrition nutrition;

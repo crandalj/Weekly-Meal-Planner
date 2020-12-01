@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 
 namespace Weekly_Meal_Planner
 {
-    [Serializable]
     public class Week
     {
         public List<Day> Days { get; set; }

@@ -24,7 +24,7 @@ namespace Weekly_Meal_Planner
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private DataController dataController;
+        public static DataController dataController;
         private Week _week;
         public MainWindow()
         {
@@ -117,32 +117,12 @@ namespace Weekly_Meal_Planner
 
         private void SaveWeek_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            if(saveFileDialog.ShowDialog() == true)
-            {
-                string fileName = saveFileDialog.FileName;
-                List<Day> days = new List<Day>(Days);
-                Week week = new Week(days);
-                try
-                {
-                    dataController.SerializeObject(week, fileName);
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-                //FileDialog.WriteAllText(saveFileDialog.FileName, thing to save)
-            }
+            // TODO
         }
 
         private void LoadWeek_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog fileDialog = new OpenFileDialog();
-
-            string fileName = fileDialog.FileName;
-            _week = dataController.DeSerializeObject<Week>(fileName);
-            
-            // assign data to Days
+            // TODO
         }
 
         private void ResetWeek_Click(object sender, RoutedEventArgs e)

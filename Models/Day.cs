@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace Weekly_Meal_Planner
 {
-    [Serializable]
     public class Day : INotifyPropertyChanged
     {
         public ObservableCollection<Meal> Meals { get; set; }

@@ -8,35 +8,143 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
-public class DataController
+namespace Weekly_Meal_Planner
 {
-    public SQLiteConnection connection;
-    public DataController(){
-        
-        connection = CreateConnection();
-    }
-
-    static SQLiteConnection CreateConnection()
+    public class DataController
     {
-        // Create database connection
-        SQLiteConnection sqlite_conn;
-        sqlite_conn = new SQLiteConnection("Data Source=database.db;Version=3;New=True;Compress=True");
+        private SQLiteConnection _connection;
+        private SQLiteDataAdapter _DB;
+        private string _connection_string = "Data Source=" + System.AppDomain.CurrentDomain.BaseDirectory + "data.db;Version=3;New=False;Compress=True";
 
-        // Open connection
-        try
+        /* 
+         DB SCHEMA
+        Tables
+        -- Meal
+        -- Ingredient
+        -- Nutrition
+
+        CREATE TABLE "Meal" (
+	        "id"	INTEGER NOT NULL UNIQUE,
+	        "name"	TEXT NOT NULL,
+	        "type"	TEXT NOT NULL CHECK(type IN ('BREAKFAST', 'LUNCH', 'DINNER', 'SNACK')),
+	        "date"	NUMERIC NOT NULL,
+	        PRIMARY KEY("id" AUTOINCREMENT)
+        )
+
+        CREATE TABLE "Ingredient" (
+	        "id"	INTEGER NOT NULL UNIQUE,
+	        "meal"	INTEGER NOT NULL,
+	        "name"	TEXT NOT NULL,
+	        "measurement"	TEXT NOT NULL,
+	        "amount"	REAL NOT NULL,
+	        FOREIGN KEY("meal") REFERENCES "Meal"("id"),
+	        PRIMARY KEY("id" AUTOINCREMENT)
+        )
+        
+        CREATE TABLE "Nutrition" (
+	        "id"	INTEGER NOT NULL UNIQUE,
+	        "meal"	INTEGER NOT NULL,
+	        "ingredient"	INTEGER NOT NULL,
+	        "calorie"	INTEGER NOT NULL DEFAULT 0,
+	        "protein"	REAL NOT NULL DEFAULT 0,
+	        "fat"	REAL NOT NULL DEFAULT 0,
+	        "carb"	REAL NOT NULL DEFAULT 0,
+	        PRIMARY KEY("id" AUTOINCREMENT),
+	        FOREIGN KEY("meal") REFERENCES "Meal"("id"),
+	        FOREIGN KEY("ingredient") REFERENCES "Ingredient"("id")
+        )
+
+         */
+
+        public DataController()
         {
-            sqlite_conn.Open();
-        }
-        catch(Exception ex)
-        {
-            Console.WriteLine(ex);
+            _connection = CreateConnection();
         }
 
-        return sqlite_conn;
+        private SQLiteConnection CreateConnection()
+        {
+            // Create database connection
+            SQLiteConnection sqlite_conn;
+            sqlite_conn = new SQLiteConnection(_connection_string);
+            Console.WriteLine(_connection_string);
+            // Open connection
+            try
+            {
+                using (sqlite_conn) 
+                {
+                    sqlite_conn.Open();
+                    // Meal table
+                    SQLiteCommand _command = new SQLiteCommand();
+                    _command.Connection = sqlite_conn;
+                    _command.CommandText = @"CREATE TABLE IF NOT EXISTS [Meal] (
+                        [id]    INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
+                        [name]  TEXT NOT NULL,
+	                    [type]  TEXT NOT NULL CHECK(type IN ('BREAKFAST', 'LUNCH', 'DINNER', 'SNACK')),
+	                    [date]  NUMERIC NOT NULL
+                    )";
+                    _command.ExecuteNonQuery();
+                    // Ingredient table
+                    _command.CommandText = @"CREATE TABLE IF NOT EXISTS [Ingredient] (
+                        [id]    INTEGER NOT NULL UNIQUE,
+                        [meal]  INTEGER NOT NULL,
+	                    [name]  TEXT NOT NULL,
+	                    [measurement]   TEXT NOT NULL,
+	                    [amount]    REAL NOT NULL,
+	                    FOREIGN KEY([meal]) REFERENCES [Meal]([id]),
+	                    PRIMARY KEY([id] AUTOINCREMENT)
+                    )";
+                    _command.ExecuteNonQuery();
+                    // Nutrition table
+                    _command.CommandText = @"CREATE TABLE IF NOT EXISTS [Nutrition] (
+                        [id]    INTEGER NOT NULL UNIQUE,
+                        [meal]  INTEGER NOT NULL,
+	                    [ingredient]    INTEGER NOT NULL,
+	                    [calorie]   INTEGER NOT NULL DEFAULT 0,
+	                    [protein]   REAL NOT NULL DEFAULT 0,
+	                    [fat]   REAL NOT NULL DEFAULT 0,
+	                    [carb]  REAL NOT NULL DEFAULT 0,
+	                    PRIMARY KEY([id] AUTOINCREMENT),
+	                    FOREIGN KEY([meal]) REFERENCES [Meal]([id]),
+	                    FOREIGN KEY([ingredient]) REFERENCES [Ingredient]([id])
+                    )";
+                    _command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+            return sqlite_conn;
+        }
+
+        public void AddMeal(Meal meal)
+        {
+            SQLiteCommand _command = new SQLiteCommand();
+            _command.CommandText = @"";
+        }
+
+        public Meal GetMealById(int id)
+        {
+            SQLiteCommand _command = new SQLiteCommand();
+            _command.CommandText = "Select * FROM meals WHERE id = " + id;
+            
+            try
+            {
+                SQLiteDataReader reader = _command.ExecuteReader();
+                // reader["column_name"] to access meal columns
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return null;
+        }
+
+
     }
-
-    
 }
+
 
     
 
