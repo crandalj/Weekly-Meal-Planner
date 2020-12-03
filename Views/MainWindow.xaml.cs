@@ -41,6 +41,7 @@ namespace Weekly_Meal_Planner
                 DayOfWeek day = (DayOfWeek)x;
                 DateTime date = sunday.AddDays(x);
                 Day newDay = new Day(day, date.Date);
+                //Console.WriteLine(day + " " + date);
                 Days.Add(newDay);
                 RefreshMealsForDay(newDay);
             }
@@ -68,6 +69,7 @@ namespace Weekly_Meal_Planner
 
                 // Insert meal to db
                 dlg.NewMeal.Date = Days[dayIndex].Date;
+                Console.WriteLine("new meal added to " + dlg.NewMeal.Date + " " + dlg.NewMeal.Day);
                 dataController.AddMeal(dlg.NewMeal);
 
                 // Refresh meals in view for updated day
@@ -116,11 +118,10 @@ namespace Weekly_Meal_Planner
             }
         }
 
-        internal void DeleteMeal(int index, int day)
+        internal void DeleteMeal(long id, int day)
         {
-
-            Days[day].Meals.RemoveAt(index);
-            Days[day].CalculateNutrition();
+            dataController.DeleteMealById(id);
+            RefreshMealsForDay(Days[day]);
         }
 
         private void ResetWeek_Click(object sender, RoutedEventArgs e)
@@ -145,6 +146,7 @@ namespace Weekly_Meal_Planner
             foreach(Meal meal in meals)
             {
                 day.Meals.Add(meal);
+                Console.WriteLine(meal.Name + " added to " + day.Date.DayOfWeek + " meal list");
             }
 
             // Refresh day's nutrition

@@ -119,7 +119,7 @@ namespace Weekly_Meal_Planner
                     _command.CommandText = "INSERT INTO [Meal](name, type, date) VALUES(@name, @type, @date)";
                     _command.Parameters.AddWithValue("@name", meal.Name);
                     _command.Parameters.AddWithValue("@type", meal.Type.ToString());
-                    _command.Parameters.AddWithValue("@date", DateTime.Now.Date);
+                    _command.Parameters.AddWithValue("@date", meal.Date);
                     _command.Prepare();
                     _command.ExecuteNonQuery();
 
@@ -227,10 +227,17 @@ namespace Weekly_Meal_Planner
             return meals;
         }
 
-        public void RemoveMeal(Meal meal)
+        public void UpdateMeal(Meal meal)
+        {
+
+        }
+
+        public void DeleteMealById(long id)
         {
             try
             {
+                // Create database connection
+                _connection = new SQLiteConnection(_connection_string);
                 using (_connection)
                 {
                     _connection.Open();
@@ -242,12 +249,20 @@ namespace Weekly_Meal_Planner
                     SQLiteCommand _command = new SQLiteCommand();
                     _command.Connection = _connection;
 
+                    _command.CommandText = "DELETE FROM [Meal] WHERE id = @id";
+                    _command.Parameters.AddWithValue("@id", id);
+                    _command.Prepare();
+                    _command.ExecuteNonQuery();
 
+                    _command.CommandText = "DELETE FROM [Ingredient] WHERE meal = @meal";
+                    _command.Parameters.AddWithValue("@meal", id);
+                    _command.Prepare();
+                    _command.ExecuteNonQuery();
 
                     transaction.Commit();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
