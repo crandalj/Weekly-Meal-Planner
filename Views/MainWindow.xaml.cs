@@ -90,7 +90,7 @@ namespace Weekly_Meal_Planner
                 return;
             }
 
-            int oldDay = (int)meal.Day;
+            int oldDay = (int)meal.Date.DayOfWeek;
             int oldIndex = (sender as ListView).SelectedIndex;
 
             // Send Meal to MealView
@@ -101,7 +101,7 @@ namespace Weekly_Meal_Planner
             // handle result
             if(dlg.DialogResult == true)
             {
-                int day = (int)dlg.NewMeal.Day;
+                int day = (int)dlg.NewMeal.Date.DayOfWeek;
 
                 // Day can be changed during editing
                 if(day != oldDay)
@@ -142,12 +142,16 @@ namespace Weekly_Meal_Planner
         {
             day.Meals.Clear();
 
+            Console.WriteLine("Retrieving meals for " + day.Date.DayOfWeek);
+
             // retrieve meals from DB
             List<Meal> meals = dataController.GetMealsForDay(day.Date);
 
-            // construct data into Meal objects
-
             // Add to day's meals list
+            foreach(Meal meal in meals)
+            {
+                day.Meals.Add(meal);
+            }
 
             Console.WriteLine("Refreshed meals for " + day.Date.DayOfWeek);
         }

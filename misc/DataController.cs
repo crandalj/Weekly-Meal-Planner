@@ -185,16 +185,36 @@ namespace Weekly_Meal_Planner
                         newMeal.Type = (MealType)Enum.Parse(typeof(MealType), reader.GetString(2));
                         //Console.WriteLine(reader.GetDateTime(3));
                         newMeal.Date = reader.GetDateTime(3);
-
+                        newMeal.Day = newMeal.Date.DayOfWeek;
                         meals.Add(newMeal);
                     }
+                    reader.Close();
 
                     foreach(Meal meal in meals)
                     {
                         // get ingredients for each meal
-
+                        _command.CommandText = "SELECT * FROM [Ingredient] WHERE meal = @meal";
+                        _command.Parameters.AddWithValue("@meal", meal.Id);
+                        _command.Prepare();
+                        reader = _command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            Ingredient newIng = new Ingredient();
+                            newIng.Id = reader.GetInt32(0);
+                            newIng.Meal = reader.GetInt32(1);
+                            newIng.Name = reader.GetString(2);
+                            newIng.Measurement = reader.GetString(3);
+                            newIng.Amount = reader.GetFloat(4);
+                            newIng.Calorie = reader.GetInt32(5);
+                            newIng.Protein = reader.GetFloat(6);
+                            newIng.Fat = reader.GetFloat(7);
+                            newIng.Carb = reader.GetFloat(8);
+                            meal.ingredients.Add(newIng);
+                        }
                         // calculate meal nutrition
+                        meal.CalculateNutrition();
                     }
+                    reader.Close();
                 }
             }
             catch (Exception ex)

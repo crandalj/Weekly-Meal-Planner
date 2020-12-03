@@ -30,7 +30,7 @@ namespace Weekly_Meal_Planner
             DataContext = this;
             
             // keep record of index and day
-            _originalDay = (int)meal.Day;
+            _originalDay = (int)meal.Date.DayOfWeek;
             _originalIndex = index;
 
             // prepare UI
@@ -62,6 +62,7 @@ namespace Weekly_Meal_Planner
             string mealName = MealName.Text;
             MealType type = (MealType)MealSelection.SelectedItem;
             DayOfWeek day = (DayOfWeek)DaySelection.SelectedItem;
+            
             List<Ingredient> ingredients = new List<Ingredient>(Ingredients);
             
             NewMeal = new Meal(mealName, type, day, ingredients);

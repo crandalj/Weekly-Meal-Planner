@@ -21,6 +21,11 @@ namespace Weekly_Meal_Planner
 
         public Nutrition nutrition;
 
+        public Ingredient()
+        {
+            this.nutrition = new Nutrition();
+        }
+
         public Ingredient(long id, long meal, string name, string measurement, float amount, float calorie = 0, float carb = 0, float fat = 0, float protein = 0)
         {
             this.Id = id;
