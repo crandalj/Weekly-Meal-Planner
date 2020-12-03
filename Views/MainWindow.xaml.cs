@@ -58,8 +58,6 @@ namespace Weekly_Meal_Planner
                 Owner = this
             };
 
-            // configure box
-
             // Open dialog box
             dlg.ShowDialog();
 
@@ -74,10 +72,6 @@ namespace Weekly_Meal_Planner
 
                 // Refresh meals in view for updated day
                 RefreshMealsForDay(Days[dayIndex]);
-                
-                // handle saving meal & updating UI
-                //Days[dayIndex].Meals.Add(dlg.NewMeal);
-                //Days[dayIndex].CalculateNutrition();
             }
         }
         protected void HandleDoubleClick(object sender, MouseButtonEventArgs e)
@@ -153,6 +147,8 @@ namespace Weekly_Meal_Planner
                 day.Meals.Add(meal);
             }
 
+            // Refresh day's nutrition
+            day.CalculateNutrition();
             Console.WriteLine("Refreshed meals for " + day.Date.DayOfWeek);
         }
 
