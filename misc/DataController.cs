@@ -177,20 +177,17 @@ namespace Weekly_Meal_Planner
                     while (reader.Read())
                     {
                         Meal newMeal = new Meal();
-                        //Console.WriteLine(reader.GetInt32(0));
                         newMeal.Id = reader.GetInt32(0);
-                        //Console.WriteLine(reader.GetString(1));
                         newMeal.Name = reader.GetString(1);
-                        //Console.WriteLine(reader.GetString(2));
                         newMeal.Type = (MealType)Enum.Parse(typeof(MealType), reader.GetString(2));
-                        //Console.WriteLine(reader.GetDateTime(3));
                         newMeal.Date = reader.GetDateTime(3);
                         newMeal.Day = newMeal.Date.DayOfWeek;
                         meals.Add(newMeal);
                     }
                     reader.Close();
 
-                    foreach(Meal meal in meals)
+                    // for each meal, get ingredients then build Meal object to add to meals
+                    foreach (Meal meal in meals)
                     {
                         // get ingredients for each meal
                         _command.CommandText = "SELECT * FROM [Ingredient] WHERE meal = @meal";
@@ -221,8 +218,6 @@ namespace Weekly_Meal_Planner
             {
                 Console.WriteLine(ex);
             }
-
-            // for each meal, get ingredients then build Meal object to add to meals
 
             return meals;
         }

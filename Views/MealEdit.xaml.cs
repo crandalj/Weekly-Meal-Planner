@@ -14,7 +14,6 @@ namespace Weekly_Meal_Planner
         public Meal NewMeal { get; set; }
 
         private int _originalDay;
-        //private int _originalIndex;
         private long _meal_id;
 
         public MealEdit()
@@ -25,14 +24,12 @@ namespace Weekly_Meal_Planner
             DeleteMealButton.IsEnabled = false;
         }
 
-        public MealEdit(Meal meal, int index)
+        public MealEdit(Meal meal)
         {
             InitializeComponent();
             DataContext = this;
             
-            // keep record of index and day
-            _originalDay = (int)meal.Date.DayOfWeek;
-            //_originalIndex = index;
+            _originalDay = (int)meal.Day;
             _meal_id = meal.Id;
 
             // prepare UI
@@ -64,7 +61,6 @@ namespace Weekly_Meal_Planner
             string mealName = MealName.Text;
             MealType type = (MealType)MealSelection.SelectedItem;
             DayOfWeek day = (DayOfWeek)DaySelection.SelectedItem;
-            Console.WriteLine(day + " was selected for meal date");
             List<Ingredient> ingredients = new List<Ingredient>(Ingredients);
             
             NewMeal = new Meal(mealName, type, day, ingredients);
@@ -79,8 +75,6 @@ namespace Weekly_Meal_Planner
             {
                 Owner = this
             };
-
-            // configure box
 
             // Open dialog box
             dlg.ShowDialog();

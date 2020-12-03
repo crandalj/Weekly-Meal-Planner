@@ -86,35 +86,24 @@ namespace Weekly_Meal_Planner
                 return;
             }
 
-            int oldDay = (int)meal.Date.DayOfWeek;
-            int oldIndex = (sender as ListView).SelectedIndex;
-
             // Send Meal to MealView
-            var dlg = new MealEdit(meal, oldIndex) { Owner = this };
+            var dlg = new MealEdit(meal) { Owner = this };
 
             dlg.ShowDialog();
             
             // handle result
             if(dlg.DialogResult == true)
             {
-                int day = (int)dlg.NewMeal.Date.DayOfWeek;
+                // update meal
+                dataController.UpdateMeal(dlg.NewMeal);
 
-                // Day can be changed during editing
-                if(day != oldDay)
+                // Day can be changed during editing so may need to refresh where it came from as well
+                if(dlg.NewMeal.Day != meal.Day)
                 {
-                    // remove old meal from old day meal list
-                    Days[oldDay].Meals.RemoveAt(oldIndex);
-                    Days[oldDay].CalculateNutrition();
-                    // Add meal to Day's meal list
-                    Days[day].Meals.Add(dlg.NewMeal);
-                    Days[day].CalculateNutrition();
+                    RefreshMealsForDay(Days[(int)meal.Day]);
                 }
-                else
-                {
-                    // Add meal to Day's meal list
-                    Days[day].Meals[oldIndex] = dlg.NewMeal;
-                    Days[day].CalculateNutrition();
-                }
+
+                RefreshMealsForDay(Days[(int)dlg.NewMeal.Day]);
             }
         }
 
@@ -137,8 +126,6 @@ namespace Weekly_Meal_Planner
         {
             day.Meals.Clear();
 
-            Console.WriteLine("Retrieving meals for " + day.Date.DayOfWeek);
-
             // retrieve meals from DB
             List<Meal> meals = dataController.GetMealsForDay(day.Date);
 
@@ -146,12 +133,10 @@ namespace Weekly_Meal_Planner
             foreach(Meal meal in meals)
             {
                 day.Meals.Add(meal);
-                Console.WriteLine(meal.Name + " added to " + day.Date.DayOfWeek + " meal list");
             }
 
             // Refresh day's nutrition
             day.CalculateNutrition();
-            Console.WriteLine("Refreshed meals for " + day.Date.DayOfWeek);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
