@@ -32,11 +32,17 @@ namespace Weekly_Meal_Planner
 
             dataController = new DataController();
 
+            // generate dates for current week
+            List<DateTime> dates = new List<DateTime>();
+            DateTime sunday = DateTime.Now.StartOfWeek(DayOfWeek.Sunday);
+
             for (int x = 0; x < 7; x++)
             {
                 DayOfWeek day = (DayOfWeek)x;
-                Day newDay = new Day(day);
+                DateTime date = sunday.AddDays(x);
+                Day newDay = new Day(day, date.Date);
                 Days.Add(newDay);
+                RefreshMealsForDay(newDay);
             }
 
             DataContext = this;
@@ -60,11 +66,18 @@ namespace Weekly_Meal_Planner
             // Process data from box if user clicks Save
             if(dlg.DialogResult == true)
             {
-                // handle saving meal & updating UI
                 int dayIndex = (int)dlg.NewMeal.Day;
-                //_week.days[dayIndex].meals.Add(dlg.NewMeal);
-                Days[dayIndex].Meals.Add(dlg.NewMeal);
-                Days[dayIndex].CalculateNutrition();
+
+                // Insert meal to db
+                dlg.NewMeal.Date = Days[dayIndex].Date;
+                dataController.AddMeal(dlg.NewMeal);
+
+                // Refresh meals in view for updated day
+                RefreshMealsForDay(Days[dayIndex]);
+                
+                // handle saving meal & updating UI
+                //Days[dayIndex].Meals.Add(dlg.NewMeal);
+                //Days[dayIndex].CalculateNutrition();
             }
         }
         protected void HandleDoubleClick(object sender, MouseButtonEventArgs e)
@@ -111,18 +124,9 @@ namespace Weekly_Meal_Planner
 
         internal void DeleteMeal(int index, int day)
         {
+
             Days[day].Meals.RemoveAt(index);
             Days[day].CalculateNutrition();
-        }
-
-        private void SaveWeek_Click(object sender, RoutedEventArgs e)
-        {
-            // TODO
-        }
-
-        private void LoadWeek_Click(object sender, RoutedEventArgs e)
-        {
-            // TODO
         }
 
         private void ResetWeek_Click(object sender, RoutedEventArgs e)
@@ -132,6 +136,20 @@ namespace Weekly_Meal_Planner
                 Days[x].Meals.Clear();
                 Days[x].CalculateNutrition();
             }
+        }
+
+        private void RefreshMealsForDay(Day day)
+        {
+            day.Meals.Clear();
+
+            // retrieve meals from DB
+            List<Meal> meals = dataController.GetMealsForDay(day.Date);
+
+            // construct data into Meal objects
+
+            // Add to day's meals list
+
+            Console.WriteLine("Refreshed meals for " + day.Date.DayOfWeek);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

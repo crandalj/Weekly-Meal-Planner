@@ -17,7 +17,7 @@
         </ObjectDataProvider>
         <ObjectDataProvider x:Key="dayEnum" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:DayOfWeek" />
+                <x:Type TypeName="local:WeekDayEnum" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Window.Resources>

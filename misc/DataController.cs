@@ -13,7 +13,6 @@ namespace Weekly_Meal_Planner
     public class DataController
     {
         private SQLiteConnection _connection;
-        private SQLiteDataAdapter _DB;
         private string _connection_string = "Data Source=" + System.AppDomain.CurrentDomain.BaseDirectory + "data.db;Version=3;New=False;Compress=True";
 
         /* 
@@ -37,21 +36,12 @@ namespace Weekly_Meal_Planner
 	        "name"	TEXT NOT NULL,
 	        "measurement"	TEXT NOT NULL,
 	        "amount"	REAL NOT NULL,
+            "calorie"   INTEGER NOT NULL DEFAULT 0,
+            "protein"   REAL NOT NULL DEFAULT 0,
+            "fat"       REAL NOT NULL DEFAULT 0,
+            "carb"      REAL NOT NULL DEFAULT 0,
 	        FOREIGN KEY("meal") REFERENCES "Meal"("id"),
 	        PRIMARY KEY("id" AUTOINCREMENT)
-        )
-        
-        CREATE TABLE "Nutrition" (
-	        "id"	INTEGER NOT NULL UNIQUE,
-	        "meal"	INTEGER NOT NULL,
-	        "ingredient"	INTEGER NOT NULL,
-	        "calorie"	INTEGER NOT NULL DEFAULT 0,
-	        "protein"	REAL NOT NULL DEFAULT 0,
-	        "fat"	REAL NOT NULL DEFAULT 0,
-	        "carb"	REAL NOT NULL DEFAULT 0,
-	        PRIMARY KEY("id" AUTOINCREMENT),
-	        FOREIGN KEY("meal") REFERENCES "Meal"("id"),
-	        FOREIGN KEY("ingredient") REFERENCES "Ingredient"("id")
         )
 
          */
@@ -66,7 +56,7 @@ namespace Weekly_Meal_Planner
             // Create database connection
             SQLiteConnection sqlite_conn;
             sqlite_conn = new SQLiteConnection(_connection_string);
-            Console.WriteLine(_connection_string);
+
             // Open connection
             try
             {
@@ -90,22 +80,12 @@ namespace Weekly_Meal_Planner
 	                    [name]  TEXT NOT NULL,
 	                    [measurement]   TEXT NOT NULL,
 	                    [amount]    REAL NOT NULL,
+                        [calorie]   INTEGER NOT NULL DEFAULT 0,
+                        [protein]   REAL NOT NULL DEFAULT 0,
+                        [fat]       REAL NOT NULL DEFAULT 0,
+                        [carb]      REAL NOT NULL DEFAULT 0,
 	                    FOREIGN KEY([meal]) REFERENCES [Meal]([id]),
 	                    PRIMARY KEY([id] AUTOINCREMENT)
-                    )";
-                    _command.ExecuteNonQuery();
-                    // Nutrition table
-                    _command.CommandText = @"CREATE TABLE IF NOT EXISTS [Nutrition] (
-                        [id]    INTEGER NOT NULL UNIQUE,
-                        [meal]  INTEGER NOT NULL,
-	                    [ingredient]    INTEGER NOT NULL,
-	                    [calorie]   INTEGER NOT NULL DEFAULT 0,
-	                    [protein]   REAL NOT NULL DEFAULT 0,
-	                    [fat]   REAL NOT NULL DEFAULT 0,
-	                    [carb]  REAL NOT NULL DEFAULT 0,
-	                    PRIMARY KEY([id] AUTOINCREMENT),
-	                    FOREIGN KEY([meal]) REFERENCES [Meal]([id]),
-	                    FOREIGN KEY([ingredient]) REFERENCES [Ingredient]([id])
                     )";
                     _command.ExecuteNonQuery();
                 }
@@ -120,8 +100,137 @@ namespace Weekly_Meal_Planner
 
         public void AddMeal(Meal meal)
         {
-            SQLiteCommand _command = new SQLiteCommand();
-            _command.CommandText = @"";
+            try
+            {
+                // Create database connection
+                _connection = new SQLiteConnection(_connection_string);
+                using (_connection)
+                {
+                    _connection.Open();
+
+                    // begin transaction
+                    SQLiteTransaction transaction = null;
+                    transaction = _connection.BeginTransaction();
+
+                    SQLiteCommand _command = new SQLiteCommand();
+                    _command.Connection = _connection;
+                    
+                    // Insert meal into database
+                    _command.CommandText = "INSERT INTO [Meal](name, type, date) VALUES(@name, @type, @date)";
+                    _command.Parameters.AddWithValue("@name", meal.Name);
+                    _command.Parameters.AddWithValue("@type", meal.Type.ToString());
+                    _command.Parameters.AddWithValue("@date", DateTime.Now.Date);
+                    _command.Prepare();
+                    _command.ExecuteNonQuery();
+
+                    long meal_id = _connection.LastInsertRowId;
+
+                    // Insert each new ingredient
+                    foreach(Ingredient ing in meal.ingredients)
+                    {
+                        // Insert Ingredient
+                        _command.CommandText = "INSERT INTO [Ingredient](meal, name, measurement, amount, calorie, protein, fat, carb) VALUES(@meal, @name, @measurement, @amount, @calorie, @protein, @fat, @carb)";
+                        _command.Parameters.AddWithValue("@meal", meal_id);
+                        _command.Parameters.AddWithValue("@name", ing.Name);
+                        _command.Parameters.AddWithValue("@measurement", ing.Measurement);
+                        _command.Parameters.AddWithValue("@amount", ing.Amount);
+                        _command.Parameters.AddWithValue("@calorie", ing.Calorie);
+                        _command.Parameters.AddWithValue("@protein", ing.Protein);
+                        _command.Parameters.AddWithValue("@fat", ing.Fat);
+                        _command.Parameters.AddWithValue("@carb", ing.Carb);
+                        _command.Prepare();
+                        _command.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            
+        }
+
+        public List<Meal> GetMealsForDay(DateTime date)
+        {
+            List<Meal> meals = new List<Meal>();
+
+            // get meals with matching date
+            try
+            {
+                // Create database connection
+                _connection = new SQLiteConnection(_connection_string);
+                using (_connection)
+                {
+                    _connection.Open();
+
+                    SQLiteCommand _command = new SQLiteCommand();
+                    _command.Connection = _connection;
+
+                    _command.CommandText = "SELECT * FROM [Meal] WHERE date = @date";
+                    _command.Parameters.AddWithValue("@date", date);
+                    _command.Prepare();
+                    
+                    SQLiteDataReader reader = _command.ExecuteReader();
+                    // Read will process row by row of the returnset, ie each meal row
+                    while (reader.Read())
+                    {
+                        Meal newMeal = new Meal();
+                        //Console.WriteLine(reader.GetInt32(0));
+                        newMeal.Id = reader.GetInt32(0);
+                        //Console.WriteLine(reader.GetString(1));
+                        newMeal.Name = reader.GetString(1);
+                        //Console.WriteLine(reader.GetString(2));
+                        newMeal.Type = (MealType)Enum.Parse(typeof(MealType), reader.GetString(2));
+                        //Console.WriteLine(reader.GetDateTime(3));
+                        newMeal.Date = reader.GetDateTime(3);
+
+                        meals.Add(newMeal);
+                    }
+
+                    foreach(Meal meal in meals)
+                    {
+                        // get ingredients for each meal
+
+                        // calculate meal nutrition
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+            // for each meal, get ingredients then build Meal object to add to meals
+
+            return meals;
+        }
+
+        public void RemoveMeal(Meal meal)
+        {
+            try
+            {
+                using (_connection)
+                {
+                    _connection.Open();
+
+                    // begin transaction
+                    SQLiteTransaction transaction = null;
+                    transaction = _connection.BeginTransaction();
+
+                    SQLiteCommand _command = new SQLiteCommand();
+                    _command.Connection = _connection;
+
+
+
+                    transaction.Commit();
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         public Meal GetMealById(int id)
