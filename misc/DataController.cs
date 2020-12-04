@@ -224,7 +224,62 @@ namespace Weekly_Meal_Planner
 
         public void UpdateMeal(Meal meal)
         {
+            try
+            {
+                // Create database connection
+                _connection = new SQLiteConnection(_connection_string);
+                using (_connection)
+                {
+                    _connection.Open();
 
+                    // begin transaction
+                    SQLiteTransaction transaction = null;
+                    transaction = _connection.BeginTransaction();
+
+                    SQLiteCommand _command = new SQLiteCommand();
+                    _command.Connection = _connection;
+
+                    // Update meal
+                    _command.CommandText = "UPDATE [Meal] SET name = @name, type = @type, date = @date WHERE id = @id";
+                    _command.Parameters.AddWithValue("@id", meal.Id);
+                    _command.Parameters.AddWithValue("@name", meal.Name);
+                    _command.Parameters.AddWithValue("@type", meal.Type.ToString());
+                    _command.Parameters.AddWithValue("@date", meal.Date);
+                    _command.Prepare();
+                    _command.ExecuteNonQuery();
+
+                    // Remove old ingredients
+                    _command.CommandText = "DELETE FROM [Ingredient] WHERE meal = @meal";
+                    _command.Parameters.AddWithValue("@meal", meal.Id);
+                    _command.Prepare();
+                    _command.ExecuteNonQuery();
+
+                    // Insert each new ingredient
+                    foreach (Ingredient ing in meal.ingredients)
+                    {
+                        // Insert Ingredient
+                        _command.CommandText = "INSERT INTO [Ingredient](meal, name, measurement, amount, calorie, protein, fat, carb) VALUES(@meal, @name, @measurement, @amount, @calorie, @protein, @fat, @carb)";
+                        _command.Parameters.AddWithValue("@meal", meal.Id);
+                        _command.Parameters.AddWithValue("@name", ing.Name);
+                        _command.Parameters.AddWithValue("@measurement", ing.Measurement);
+                        _command.Parameters.AddWithValue("@amount", ing.Amount);
+                        _command.Parameters.AddWithValue("@calorie", ing.Calorie);
+                        _command.Parameters.AddWithValue("@protein", ing.Protein);
+                        _command.Parameters.AddWithValue("@fat", ing.Fat);
+                        _command.Parameters.AddWithValue("@carb", ing.Carb);
+                        _command.Prepare();
+                        _command.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                    Console.WriteLine("Meal has been updated");
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            
         }
 
         public void DeleteMealById(long id)

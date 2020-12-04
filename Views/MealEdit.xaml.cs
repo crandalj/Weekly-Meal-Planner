@@ -14,7 +14,7 @@ namespace Weekly_Meal_Planner
         public Meal NewMeal { get; set; }
 
         private int _originalDay;
-        private long _meal_id;
+        private long _meal_id = -1;
 
         public MealEdit()
         {
@@ -62,9 +62,9 @@ namespace Weekly_Meal_Planner
             MealType type = (MealType)MealSelection.SelectedItem;
             DayOfWeek day = (DayOfWeek)DaySelection.SelectedItem;
             List<Ingredient> ingredients = new List<Ingredient>(Ingredients);
-            
+
             NewMeal = new Meal(mealName, type, day, ingredients);
- 
+
             DialogResult = true;
         }
 

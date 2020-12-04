@@ -94,6 +94,12 @@ namespace Weekly_Meal_Planner
             // handle result
             if(dlg.DialogResult == true)
             {
+                // copy id to newmeal
+                dlg.NewMeal.Id = meal.Id;
+
+                // assign date based on day of week
+                dlg.NewMeal.Date = Days[(int)dlg.NewMeal.Day].Date;
+
                 // update meal
                 dataController.UpdateMeal(dlg.NewMeal);
 
