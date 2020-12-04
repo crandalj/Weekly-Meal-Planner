@@ -8,10 +8,11 @@ This application is a primarily a research project to get familiar with the .NET
 - Add meals to the week
 - Customize ingredients in the meal
 - Track nutrition details for meal and days
+- Meal data is persistent and stored in a local database
 
 # Planned Features
-- Save/Load meal data
 
 # Possible Features
 - Use food API to manage ingredients
-- Save meals to favorites to simplify meal tracking 
+- Save meals to favorites to simplify meal tracking
+- Add ability to see more than current week
