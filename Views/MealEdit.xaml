@@ -7,6 +7,7 @@
       xmlns:local="clr-namespace:Weekly_Meal_Planner"
       mc:Ignorable="d" 
       d:DesignHeight="400" d:DesignWidth="600"
+      WindowStartupLocation="CenterOwner"
       Title="Meal" Height="400" Width="600">
 
     <Window.Resources>

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Weekly_Meal_Planner"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
         Title="Ingredient" Height="400" Width="400">
     <Grid Background="White">
         <Grid.ColumnDefinitions>
