@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace Weekly_Meal_Planner
 {
-    [Serializable]
     public class Meal
     {   
         public Nutrition nutrition;
         public List<Ingredient> ingredients;
 
+        public long Id { get; set; }
+        public DateTime Date { get; set; }
         public string Name { get; set; }
         public MealType Type { get; set; }
         public DayOfWeek Day { get; set; }
@@ -20,6 +21,18 @@ namespace Weekly_Meal_Planner
         {
             this.nutrition = new Nutrition();
             this.ingredients = new List<Ingredient>();
+        }
+
+        public Meal(long id, DateTime date, string name, MealType mealType, DayOfWeek day, List<Ingredient> ingredients)
+        {
+            Id = id;
+            Date = date;
+            Name = name;
+            Type = mealType;
+            Day = day;
+            nutrition = new Nutrition();
+            this.ingredients = ingredients;
+            CalculateNutrition();
         }
 
         public Meal(string name, MealType mealType, DayOfWeek day, List<Ingredient> ingredients)

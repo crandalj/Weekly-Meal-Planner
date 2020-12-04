@@ -24,7 +24,7 @@ namespace Weekly_Meal_Planner
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private DataController dataController;
+        public static DataController dataController;
         private Week _week;
         public MainWindow()
         {
@@ -32,11 +32,18 @@ namespace Weekly_Meal_Planner
 
             dataController = new DataController();
 
+            // generate dates for current week
+            List<DateTime> dates = new List<DateTime>();
+            DateTime sunday = DateTime.Now.StartOfWeek(DayOfWeek.Sunday);
+
             for (int x = 0; x < 7; x++)
             {
                 DayOfWeek day = (DayOfWeek)x;
-                Day newDay = new Day(day);
+                DateTime date = sunday.AddDays(x);
+                Day newDay = new Day(day, date.Date);
+                //Console.WriteLine(day + " " + date);
                 Days.Add(newDay);
+                RefreshMealsForDay(newDay);
             }
 
             DataContext = this;
@@ -52,19 +59,21 @@ namespace Weekly_Meal_Planner
                 Owner = this
             };
 
-            // configure box
-
             // Open dialog box
             dlg.ShowDialog();
 
             // Process data from box if user clicks Save
             if(dlg.DialogResult == true)
             {
-                // handle saving meal & updating UI
                 int dayIndex = (int)dlg.NewMeal.Day;
-                //_week.days[dayIndex].meals.Add(dlg.NewMeal);
-                Days[dayIndex].Meals.Add(dlg.NewMeal);
-                Days[dayIndex].CalculateNutrition();
+
+                // Insert meal to db
+                dlg.NewMeal.Date = Days[dayIndex].Date;
+                Console.WriteLine("new meal added to " + dlg.NewMeal.Date + " " + dlg.NewMeal.Day);
+                dataController.AddMeal(dlg.NewMeal);
+
+                // Refresh meals in view for updated day
+                RefreshMealsForDay(Days[dayIndex]);
             }
         }
         protected void HandleDoubleClick(object sender, MouseButtonEventArgs e)
@@ -77,72 +86,37 @@ namespace Weekly_Meal_Planner
                 return;
             }
 
-            int oldDay = (int)meal.Day;
-            int oldIndex = (sender as ListView).SelectedIndex;
-
             // Send Meal to MealView
-            var dlg = new MealEdit(meal, oldIndex) { Owner = this };
+            var dlg = new MealEdit(meal) { Owner = this };
 
             dlg.ShowDialog();
             
             // handle result
             if(dlg.DialogResult == true)
             {
-                int day = (int)dlg.NewMeal.Day;
+                // copy id to newmeal
+                dlg.NewMeal.Id = meal.Id;
 
-                // Day can be changed during editing
-                if(day != oldDay)
+                // assign date based on day of week
+                dlg.NewMeal.Date = Days[(int)dlg.NewMeal.Day].Date;
+
+                // update meal
+                dataController.UpdateMeal(dlg.NewMeal);
+
+                // Day can be changed during editing so may need to refresh where it came from as well
+                if(dlg.NewMeal.Day != meal.Day)
                 {
-                    // remove old meal from old day meal list
-                    Days[oldDay].Meals.RemoveAt(oldIndex);
-                    Days[oldDay].CalculateNutrition();
-                    // Add meal to Day's meal list
-                    Days[day].Meals.Add(dlg.NewMeal);
-                    Days[day].CalculateNutrition();
+                    RefreshMealsForDay(Days[(int)meal.Day]);
                 }
-                else
-                {
-                    // Add meal to Day's meal list
-                    Days[day].Meals[oldIndex] = dlg.NewMeal;
-                    Days[day].CalculateNutrition();
-                }
+
+                RefreshMealsForDay(Days[(int)dlg.NewMeal.Day]);
             }
         }
 
-        internal void DeleteMeal(int index, int day)
+        internal void DeleteMeal(long id, int day)
         {
-            Days[day].Meals.RemoveAt(index);
-            Days[day].CalculateNutrition();
-        }
-
-        private void SaveWeek_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            if(saveFileDialog.ShowDialog() == true)
-            {
-                string fileName = saveFileDialog.FileName;
-                List<Day> days = new List<Day>(Days);
-                Week week = new Week(days);
-                try
-                {
-                    dataController.SerializeObject(week, fileName);
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-                //FileDialog.WriteAllText(saveFileDialog.FileName, thing to save)
-            }
-        }
-
-        private void LoadWeek_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog fileDialog = new OpenFileDialog();
-
-            string fileName = fileDialog.FileName;
-            _week = dataController.DeSerializeObject<Week>(fileName);
-            
-            // assign data to Days
+            dataController.DeleteMealById(id);
+            RefreshMealsForDay(Days[day]);
         }
 
         private void ResetWeek_Click(object sender, RoutedEventArgs e)
@@ -152,6 +126,23 @@ namespace Weekly_Meal_Planner
                 Days[x].Meals.Clear();
                 Days[x].CalculateNutrition();
             }
+        }
+
+        private void RefreshMealsForDay(Day day)
+        {
+            day.Meals.Clear();
+
+            // retrieve meals from DB
+            List<Meal> meals = dataController.GetMealsForDay(day.Date);
+
+            // Add to day's meals list
+            foreach(Meal meal in meals)
+            {
+                day.Meals.Add(meal);
+            }
+
+            // Refresh day's nutrition
+            day.CalculateNutrition();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Weekly_Meal_Planner
 {
-    [Serializable]
     public class Nutrition : INotifyPropertyChanged
     {
         private float _calorie = 0;

@@ -9,12 +9,11 @@ using System.Threading.Tasks;
 
 namespace Weekly_Meal_Planner
 {
-    [Serializable]
     public class Day : INotifyPropertyChanged
     {
         public ObservableCollection<Meal> Meals { get; set; }
 
-        public string date;
+        public DateTime Date { get; set; }
 
         private Nutrition _nutrition;
 
@@ -22,11 +21,11 @@ namespace Weekly_Meal_Planner
 
         public DayOfWeek DayOfWeek { get; set; }
 
-        public Day(DayOfWeek day)
+        public Day(DayOfWeek day, DateTime date)
         {
             DayOfWeek = day;
             Meals = new ObservableCollection<Meal>();
-            this.date = "";
+            Date = date;
             this._nutrition = new Nutrition();
         }
 

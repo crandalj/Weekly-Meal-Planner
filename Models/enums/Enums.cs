@@ -16,7 +16,7 @@ namespace Weekly_Meal_Planner
         DINNER,
         [Description("Snack")]
         SNACK }
-    public enum DayOfWeek {
+    public enum WeekDayEnum {
         [Description("Sunday")]
         SUNDAY,
         [Description("Monday")]

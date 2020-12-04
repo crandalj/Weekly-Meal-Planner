@@ -1,20 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace Weekly_Meal_Planner
 {
@@ -26,7 +14,7 @@ namespace Weekly_Meal_Planner
         public Meal NewMeal { get; set; }
 
         private int _originalDay;
-        private int _originalIndex;
+        private long _meal_id = -1;
 
         public MealEdit()
         {
@@ -36,14 +24,13 @@ namespace Weekly_Meal_Planner
             DeleteMealButton.IsEnabled = false;
         }
 
-        public MealEdit(Meal meal, int index)
+        public MealEdit(Meal meal)
         {
             InitializeComponent();
             DataContext = this;
             
-            // keep record of index and day
             _originalDay = (int)meal.Day;
-            _originalIndex = index;
+            _meal_id = meal.Id;
 
             // prepare UI
             DaySelection.SelectedIndex = _originalDay;
@@ -75,9 +62,9 @@ namespace Weekly_Meal_Planner
             MealType type = (MealType)MealSelection.SelectedItem;
             DayOfWeek day = (DayOfWeek)DaySelection.SelectedItem;
             List<Ingredient> ingredients = new List<Ingredient>(Ingredients);
-            
+
             NewMeal = new Meal(mealName, type, day, ingredients);
- 
+
             DialogResult = true;
         }
 
@@ -88,8 +75,6 @@ namespace Weekly_Meal_Planner
             {
                 Owner = this
             };
-
-            // configure box
 
             // Open dialog box
             dlg.ShowDialog();
@@ -130,7 +115,7 @@ namespace Weekly_Meal_Planner
         {
             var owner = this.Owner as MainWindow;
 
-            owner.DeleteMeal(_originalIndex, _originalDay);
+            owner.DeleteMeal(_meal_id, _originalDay);
 
             DialogResult = false;
         }

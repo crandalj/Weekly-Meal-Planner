@@ -54,8 +54,6 @@
         </Border>
         <!-- Buttons -->
         <Button Grid.Column="3" Grid.Row="0" Click="NewMeal" Style="{StaticResource weekViewButtonStyle}">New Meal</Button>
-        <Button Grid.Column="4" Grid.Row="0" Click="SaveWeek_Click" Style="{StaticResource weekViewButtonStyle}">Save Week</Button>
-        <Button Grid.Column="5" Grid.Row="0" Click="LoadWeek_Click" Style="{StaticResource weekViewButtonStyle}">Load Week</Button>
         <Button Grid.Column="6" Grid.Row="0" Click="ResetWeek_Click" Style="{StaticResource weekViewButtonStyle}">Reset Week</Button>
         <!-- Days of the Week Labels -->
         <Border Grid.Column="0" Grid.Row="1" Style="{StaticResource dayBorderStyle}">

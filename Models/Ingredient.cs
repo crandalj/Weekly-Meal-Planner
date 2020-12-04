@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Weekly_Meal_Planner
 {
-    [Serializable]
     public class Ingredient
     {
+        public long Id { get; set; }
+        public long Meal { get; set; }
         public string Name { get; set; }
         public string Measurement { get; set; }
         public float Amount { get; set; }
@@ -19,6 +20,21 @@ namespace Weekly_Meal_Planner
         public float Protein { get { return nutrition.Protein; } set { nutrition.Protein = value; } }
 
         public Nutrition nutrition;
+
+        public Ingredient()
+        {
+            this.nutrition = new Nutrition();
+        }
+
+        public Ingredient(long id, long meal, string name, string measurement, float amount, float calorie = 0, float carb = 0, float fat = 0, float protein = 0)
+        {
+            this.Id = id;
+            this.Meal = meal;
+            this.Name = name;
+            this.Measurement = measurement;
+            this.Amount = amount;
+            this.nutrition = new Nutrition(calorie, carb, fat, protein);
+        }
 
         public Ingredient(string name, string measurement, float amount, float calorie = 0, float carb = 0, float fat = 0, float protein = 0)
         {
